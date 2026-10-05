@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Nexrun AI</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box}
+body{margin:0;font:15px/1.5 Inter,system-ui,sans-serif;color:#0a0a0a;background:#fafafa;overflow-x:hidden}
+h1{font-size:26px;margin:0 0 14px}h3{margin:0 0 4px;font-size:16px}
+.mu{color:#6b6b6b}.sm{font-size:13px}.err{color:#b00020;min-height:20px;font-size:14px}
+.logo{font-weight:700;font-size:20px;letter-spacing:-.02em}
+.card{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:16px;margin-bottom:12px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px}
+.shell{display:flex;min-height:100vh}
+aside{width:230px;flex:none;background:#fff;border-right:1px solid #e5e5e5;padding:16px;position:sticky;top:0;height:100vh;display:flex;flex-direction:column;gap:8px}
+main{flex:1;min-width:0;padding:20px;max-width:1000px}
+.nav{display:flex;flex-direction:column;gap:2px;margin:8px 0 auto}
+.n{text-align:left;border:0;background:none;color:#0a0a0a;border-radius:10px;padding:10px 12px;font:inherit;cursor:pointer}
+.n.on{background:#0a0a0a;color:#fff}
+.badge{align-self:flex-start;border:1px solid #0a0a0a;border-radius:99px;padding:1px 10px;font-size:12px;font-weight:700}
+.b{background:#0a0a0a;color:#fff;border:1px solid #0a0a0a;border-radius:12px;padding:10px 16px;font:inherit;font-weight:700;cursor:pointer;min-height:44px}
+.b.o{background:#fff;color:#0a0a0a;border-color:#d4d4d4}.b:disabled{opacity:.5;cursor:default}
+.row{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0}
+.chip{border:1px solid #d4d4d4;background:#fff;border-radius:99px;padding:6px 12px;font:inherit;font-size:13px;cursor:pointer}
+input,textarea{width:100%;border:1px solid #d4d4d4;border-radius:12px;padding:12px;font:inherit;background:#fff;color:#0a0a0a;margin:4px 0 10px}
+textarea.code{font:13px/1.5 ui-monospace,Menlo,Consolas,monospace;min-height:340px;white-space:pre;overflow:auto;resize:vertical}
+:focus-visible{outline:2px solid #0a0a0a;outline-offset:2px}
+pre{background:#0a0a0a;color:#f5f5f5;border-radius:12px;padding:12px;overflow:auto;font-size:13px;margin:8px 0}
+.msg{border:1px solid #e5e5e5;border-radius:14px;padding:10px 12px;margin:8px 0;background:#fff;white-space:pre-wrap;overflow-wrap:anywhere}
+.msg.u{background:#0a0a0a;color:#fff;margin-left:20%}
+#pw{display:flex;justify-content:center}#pv{width:100%;height:68vh;border:1px solid #d4d4d4;border-radius:14px;background:#fff}
+#pw.mob #pv{width:375px;max-width:100%}
+@media(max-width:859px){.shell{flex-direction:column}aside{width:auto;height:auto;position:static;border-right:0;border-bottom:1px solid #e5e5e5;padding:12px}.nav{flex-direction:row;flex-wrap:wrap;margin:4px 0}.n{padding:8px 10px;font-size:14px;border:1px solid #e5e5e5}main{padding:14px}.msg.u{margin-left:8%}}
+</style>
+</head>
+<body>
+<div id="auth" hidden><div class="card" style="max-width:380px;margin:10vh auto 0">
+<div class="logo">Nexrun AI</div><p class="mu">Describe it. Build it. Learn it.</p>
+<form id="af"><label for="em">Email</label><input id="em" type="email" autocomplete="email" required>
+<label for="pw2">Password</label><input id="pw2" type="password" autocomplete="current-password" minlength="6" required>
+<p id="ae" class="err" role="alert"></p><button class="b" id="as" style="width:100%">Log in</button></form>
+<p class="sm" style="text-align:center"><a href="#" id="at">Create an account</a></p></div></div>
+
+<div id="app" class="shell" hidden>
+<aside><div class="logo">Nexrun AI</div><div class="sm mu" id="who" style="overflow-wrap:anywhere"></div><span class="badge" id="pb">Free</span>
+<nav class="nav" id="nav"></nav><button class="b o" id="lo">Log out</button></aside>
+<main>
+<section class="pg" id="pg-overview"><h1>Overview</h1>
+<div class="grid"><div class="card"><div class="sm mu">Current plan</div><h3 id="ov-plan"></h3></div><div class="card"><div class="sm mu">Projects</div><h3 id="ov-n">0</h3></div></div>
+<div class="card"><h3>Start building</h3><p class="mu">Describe an idea and Nexrun writes the code.</p><button class="b" data-go="builder">Open AI Builder</button></div></section>
+
+<section class="pg" id="pg-builder" hidden><h1>AI Builder</h1>
+<label for="bp">What should we build?</label><textarea id="bp" rows="4" maxlength="2000" placeholder="Create a modern portfolio website for a web designer."></textarea>
+<div class="row" id="ex"></div><button class="b" id="bg">Generate</button><p class="err" id="be" role="alert"></p>
+<div class="card" id="bi" hidden><h3 id="bt"></h3><p class="mu" id="bd"></p><button class="b o" data-go="editor">Open in editor</button></div></section>
+
+<section class="pg" id="pg-assistant" hidden><h1>AI Assistant</h1><div id="chat"></div>
+<div class="row" id="qx"></div>
+<label class="sm"><input type="checkbox" id="inc" style="width:auto;margin:0 6px 0 0">Include my editor code</label>
+<textarea id="q" rows="2" maxlength="2000" placeholder="Ask anything about code"></textarea><button class="b" id="send">Send</button></section>
+
+<section class="pg" id="pg-editor" hidden><h1>Code Editor</h1>
+<label for="pt" class="sm mu">Project name</label><input id="pt" maxlength="120">
+<div class="row" id="tabs"></div>
+<textarea class="code" id="ed-html" spellcheck="false" aria-label="HTML"></textarea>
+<textarea class="code" id="ed-css" spellcheck="false" aria-label="CSS" hidden></textarea>
+<textarea class="code" id="ed-js" spellcheck="false" aria-label="JavaScript" hidden></textarea>
+<div class="row"><button class="b" id="run">Run</button><button class="b o" id="sv">Save</button><button class="b o" id="cl">Clear</button><button class="b o" id="cp">Copy</button><button class="b o" id="dl">Download</button></div>
+<p class="sm mu" id="em2"></p></section>
+
+<section class="pg" id="pg-preview" hidden><h1>Live Preview</h1>
+<div class="row"><button class="b o" id="rf">Refresh</button><button class="b o" id="dk">Desktop</button><button class="b o" id="mb">Mobile</button><button class="b o" id="fs">Fullscreen</button></div>
+<div id="pw"><iframe id="pv" title="Preview" sandbox="allow-scripts allow-forms allow-modals"></iframe></div></section>
+
+<section class="pg" id="pg-projects" hidden><h1>Projects</h1><button class="b" id="np">New project</button>
+<div class="grid" id="plist" style="margin-top:14px"></div></section>
+
+<section class="pg" id="pg-pro" hidden><h1>Pro</h1><div class="card" style="border:2px solid #0a0a0a">
+<div style="font-size:34px;font-weight:700">₹999 <span class="sm mu" style="font-weight:400">/ month</span></div>
+<ul><li>Higher AI usage</li><li>More projects</li><li>Advanced coding tools</li><li>Faster generation</li><li>Premium workspace features</li></ul>
+<button class="b" id="up">Upgrade to Pro</button><p class="mu" id="un"></p></div></section>
+
+<section class="pg" id="pg-settings" hidden><h1>Settings</h1><div class="card">
+<p class="sm mu">Email</p><p id="s-em"></p><p class="sm mu">Current plan</p><p id="s-pl"></p><p class="sm mu">Subscription status</p><p id="s-st"></p><p class="sm mu">Member since</p><p id="s-cr"></p>
+<button class="b o" id="lo2">Log out</button></div></section>
+</main></div>
+
+<script type="module">
+import {initializeApp} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import {getAuth,onAuthStateChanged,signInWithEmailAndPassword,createUserWithEmailAndPassword,signOut} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import {getFirestore,doc,getDoc,setDoc,collection,addDoc,updateDoc,deleteDoc,getDocs,query,orderBy,serverTimestamp} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import {getFunctions,httpsCallable} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-functions.js";
+const firebaseConfig={apiKey:"AIzaSyCArpqIsRnueMuojv76uk8Kd4YOJX51Ndc",authDomain:"nexrun-ai.firebaseapp.com",projectId:"nexrun-ai",storageBucket:"nexrun-ai.firebasestorage.app",messagingSenderId:"815882738602",appId:"1:815882738602:web:3474c4ad41b481a319a9d3",measurementId:"G-QD6SG8GJ7N"};
+const fb=initializeApp(firebaseConfig),auth=getAuth(fb),db=getFirestore(fb),ai=httpsCallable(getFunctions(fb),"nexrunAI",{timeout:120000});
+const $=i=>document.getElementById(i);
+const h=(t,a={},...k)=>{const e=document.createElement(t);for(const[n,v]of Object.entries(a))n.startsWith("on")?e[n]=v:e.setAttribute(n,v);k.flat().forEach(c=>e.append(c));return e};
+const blank=()=>({id:null,title:"Untitled project",description:"",html:"",css:"",js:""});
+let user=null,prof=null,P=blank(),tab="html",signup=false,tm;
+const msg=x=>({"auth/invalid-credential":"Wrong email or password.","auth/email-already-in-use":"That email already has an account. Log in instead.","auth/weak-password":"Password needs at least 6 characters.","auth/invalid-email":"Enter a valid email address.","auth/too-many-requests":"Too many attempts. Try again later."}[x.code]||(x.message||"Something went wrong.").replace("Firebase: ",""));
+const copy=t=>navigator.clipboard&&navigator.clipboard.writeText(t);
+
+/* nav */
+[["overview","Overview"],["builder","AI Builder"],["assistant","AI Assistant"],["editor","Code Editor"],["preview","Live Preview"],["projects","Projects"],["pro","Pro"],["settings","Settings"]].forEach(([p,l])=>$("nav").append(h("button",{class:"n","data-p":p,onclick:()=>go(p)},l)));
+document.querySelectorAll("[data-go]").forEach(b=>b.onclick=()=>go(b.dataset.go));
+function go(p){document.querySelectorAll(".pg").forEach(s=>s.hidden=s.id!=="pg-"+p);document.querySelectorAll(".n").forEach(b=>b.classList.toggle("on",b.dataset.p===p));
+if(p==="projects")loadProjects();if(p==="preview")pv();if(p==="overview")count();if(p==="settings")sett();window.scrollTo(0,0)}
+
+/* auth */
+$("at").onclick=e=>{e.preventDefault();signup=!signup;$("as").textContent=signup?"Sign up":"Log in";$("at").textContent=signup?"I already have an account":"Create an account";$("ae").textContent=""};
+$("af").onsubmit=async e=>{e.preventDefault();$("ae").textContent="";try{await(signup?createUserWithEmailAndPassword:signInWithEmailAndPassword)(auth,$("em").value.trim(),$("pw2").value)}catch(x){$("ae").textContent=msg(x)}};
+const out=()=>signOut(auth);$("lo").onclick=out;$("lo2").onclick=out;
+onAuthStateChanged(auth,async u=>{user=u;$("auth").hidden=!!u;$("app").hidden=!u;if(!u)return;
+try{const r=doc(db,"users",u.uid);let s=await getDoc(r);if(!s.exists()){await setDoc(r,{email:u.email,plan:"free",subscriptionStatus:"inactive",createdAt:serverTimestamp()});s=await getDoc(r)}prof=s.data()}catch(e){prof={plan:"free",subscriptionStatus:"inactive"}}
+const pl=prof.plan==="pro"?"Pro":"Free";$("who").textContent=u.email;$("pb").textContent=pl;$("ov-plan").textContent=pl;P=blank();setCode();go("overview")});
+
+/* editor + preview */
+const T=["html","css","js"];
+T.forEach(t=>{$("tabs").append(h("button",{class:"chip","data-t":t,onclick:()=>showTab(t)},t==="js"?"JavaScript":t.toUpperCase()));$("ed-"+t).oninput=()=>{clearTimeout(tm);tm=setTimeout(()=>{read();$("pv").srcdoc=compose()},400)}});
+function showTab(t){tab=t;T.forEach(x=>$("ed-"+x).hidden=x!==t);document.querySelectorAll("#tabs .chip").forEach(c=>c.style.background=c.dataset.t===t?"#0a0a0a":"#fff",document.querySelectorAll("#tabs .chip").forEach(c=>c.style.color=c.dataset.t===t?"#fff":"#0a0a0a"))}
+function setCode(){T.forEach(t=>$("ed-"+t).value=P[t]);$("pt").value=P.title;showTab(tab)}
+function read(){T.forEach(t=>P[t]=$("ed-"+t).value);P.title=$("pt").value.trim()||"Untitled project"}
+function compose(){const j=P.js.replace(/<\/script/gi,"<\\/script");return `<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>${P.css}</style></head><body>${P.html}<script>${j}<\/script></body></html>`}
+function pv(){read();$("pv").srcdoc=compose()}
+$("run").onclick=()=>go("preview");$("rf").onclick=pv;
+$("dk").onclick=()=>$("pw").classList.remove("mob");$("mb").onclick=()=>$("pw").classList.add("mob");
+$("fs").onclick=()=>{const f=$("pv");(f.requestFullscreen||f.webkitRequestFullscreen||(()=>{})).call(f)};
+$("cl").onclick=()=>{$("ed-"+tab).value="";read();$("pv").srcdoc=compose()};
+$("cp").onclick=()=>copy($("ed-"+tab).value);
+$("dl").onclick=()=>{read();const a=h("a",{href:URL.createObjectURL(new Blob([compose()],{type:"text/html"})),download:P.title.replace(/\W+/g,"-").toLowerCase()+".html"});a.click()};
+$("sv").onclick=async()=>{try{await save();$("em2").textContent="Saved."}catch(e){$("em2").textContent="Could not save: "+msg(e)}};
+async function save(){read();const d={title:P.title,description:P.description,html:P.html,css:P.css,js:P.js,updatedAt:serverTimestamp()},c=collection(db,"users",user.uid,"projects");
+if(P.id)await updateDoc(doc(c,P.id),d);else P.id=(await addDoc(c,{...d,createdAt:serverTimestamp()})).id}
+
+/* builder */
+["Create a modern portfolio website for a web designer.","A to-do list app with dark mode","A landing page for a coffee shop","A simple calculator"].forEach(t=>$("ex").append(h("button",{class:"chip",onclick:()=>$("bp").value=t},t)));
+$("bg").onclick=async()=>{const p=$("bp").value.trim();$("be").textContent="";if(p.length<3){$("be").textContent="Describe what you want to build.";return}
+$("bg").disabled=true;$("bg").textContent="Generating...";
+try{const r=(await ai({mode:"builder",prompt:p})).data;P={...blank(),title:r.title,description:r.description,html:r.html,css:r.css,js:r.js};setCode();$("bt").textContent=r.title;$("bd").textContent=r.description;$("bi").hidden=false;
+try{await save()}catch(e){}go("preview")}catch(e){$("be").textContent=msg(e)}
+$("bg").disabled=false;$("bg").textContent="Generate"};
+
+/* assistant */
+["How do I create a navbar?","Fix this JavaScript","Explain this HTML","Add dark mode","Make this website responsive","Add animations"].forEach(t=>$("qx").append(h("button",{class:"chip",onclick:()=>$("q").value=t},t)));
+$("send").onclick=async()=>{const q=$("q").value.trim();if(!q)return;read();const inc=$("inc").checked,c=$("chat");
+c.append(h("div",{class:"msg u"},q));const w=h("div",{class:"msg"},"Thinking...");c.append(w);$("q").value="";$("send").disabled=true;
+try{const r=(await ai({mode:inc?"code":"assistant",prompt:q,context:inc?`HTML:\n${P.html}\nCSS:\n${P.css}\nJS:\n${P.js}`:""})).data;w.textContent=r.answer;
+if(r.code){w.append(h("pre",{},r.code),h("button",{class:"chip",onclick:()=>copy(r.code)},"Copy code"))}}catch(e){w.textContent="Error: "+msg(e)}
+$("send").disabled=false;w.scrollIntoView({block:"nearest"})};
+
+/* projects */
+async function loadProjects(){const l=$("plist");l.textContent="Loading...";
+try{const s=await getDocs(query(collection(db,"users",user.uid,"projects"),orderBy("updatedAt","desc")));l.textContent="";
+if(s.empty)l.textContent="No projects yet. Create one or generate one in AI Builder.";
+s.forEach(d=>{const x=d.data(),t=x.updatedAt&&x.updatedAt.toDate?x.updatedAt.toDate().toLocaleString():"Just now";
+l.append(h("div",{class:"card"},h("h3",{},x.title),h("p",{class:"mu"},x.description||"No description"),h("p",{class:"sm mu"},"Updated "+t),
+h("div",{class:"row"},h("button",{class:"b",onclick:()=>{P={id:d.id,title:x.title,description:x.description||"",html:x.html||"",css:x.css||"",js:x.js||""};setCode();go("editor")}},"Open"),
+h("button",{class:"b o",onclick:async()=>{if(confirm("Delete this project?")){await deleteDoc(d.ref);loadProjects()}}},"Delete"))))})}
+catch(e){l.textContent="Could not load projects: "+msg(e)}}
+$("np").onclick=()=>{P=blank();setCode();go("editor")};
+async function count(){try{$("ov-n").textContent=(await getDocs(collection(db,"users",user.uid,"projects"))).size}catch(e){}}
+
+/* pro + settings */
+$("up").onclick=()=>$("un").textContent="Payment integration coming in Step 12.";
+function sett(){const f=t=>t?t.toDate().toLocaleDateString():"";$("s-em").textContent=user.email;$("s-pl").textContent=prof.plan==="pro"?"Pro":"Free";$("s-st").textContent=prof.subscriptionStatus||"inactive";$("s-cr").textContent=f(prof.createdAt)||"Today"}
+</script>
+</body>
+</html>

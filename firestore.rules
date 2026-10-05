@@ -1,0 +1,19 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{db}/documents {
+    match /users/{uid} {
+      allow read: if request.auth != null && request.auth.uid == uid;
+      // Users may create their own FREE profile only. Plan changes happen on the server.
+      allow create: if request.auth != null && request.auth.uid == uid
+        && request.resource.data.keys().hasOnly(['email','plan','subscriptionStatus','createdAt'])
+        && request.resource.data.plan == 'free'
+        && request.resource.data.subscriptionStatus == 'inactive';
+      allow update, delete: if false;
+      match /projects/{pid} {
+        allow read, delete: if request.auth != null && request.auth.uid == uid;
+        allow create, update: if request.auth != null && request.auth.uid == uid
+          && request.resource.data.title is string && request.resource.data.title.size() <= 120;
+      }
+    }
+  }
+}
